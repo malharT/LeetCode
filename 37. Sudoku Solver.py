@@ -2,7 +2,7 @@ class Solution:
     def solve_by_trial_and_error(self, values_to_fill, rows, cols, boxes, board):
         if not values_to_fill:
             return True
-        row, col = values_to_fill.pop()
+        row, col = values_to_fill.pop(0)
         box_i = 3*(row//3) + (col//3)
         candidate_vals = rows[row].intersection(cols[col])
         candidate_vals = candidate_vals.intersection(boxes[box_i])
@@ -21,7 +21,7 @@ class Solution:
                     board[row][col] = "."
                 if sol:
                     break
-        values_to_fill.add((row, col))
+        values_to_fill.insert(0,(row, col))
         return sol
 
     def solveSudoku(self, board):
@@ -142,6 +142,17 @@ class Solution:
 
         for box in boxes:
             boxes_options.append(all_nums - box)
+
+        new_values_to_fill = []
+        for val in values_to_fill:
+            row, col = val
+            box_i = 3*(row//3) + (col//3)
+            candidate_vals = rows[row].intersection(cols[col])
+            candidate_vals = candidate_vals.intersection(boxes[box_i])
+            new_values_to_fill.append((row, col, len(candidate_vals)))
+
+        values_to_fill = sorted(new_values_to_fill, key=lambda s: s[2])
+        values_to_fill = [(row,col) for row, col, _ in values_to_fill]
 
         solution = self.solve_by_trial_and_error(
             values_to_fill, rows_options, cols_options, boxes_options, board)

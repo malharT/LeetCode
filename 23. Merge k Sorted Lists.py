@@ -1,42 +1,31 @@
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
 class Solution:
     def merge(self, list1, list2):
         if list1 is None:
             return list2
         if list2 is None:
             return list1
-        list1_node = list1
-        list2_node = list2
-        if list1_node.val < list2_node.val:
-            list1 = list1_node.next
-            list1_node.next = None
-            new_list_head = list1_node
-
-        else:
-            list2 = list2_node.next
-            list2_node.next = None
-            new_list_head = list2_node
-        new_list = new_list_head
-
+        new_list = ListNode()
+        list_head = new_list
         while(list1 is not None and list2 is not None):
-            list1_node = list1
-            list2_node = list2
-            if list1_node.val < list2_node.val:
-                list1 = list1_node.next
-                list1_node.next = None
-                new_list.next = list1_node
-
+            if list1.val < list2.val:
+                new_list.next = list1
+                list1 = list1.next
             else:
-                list2 = list2_node.next
-                list2_node.next = None
-                new_list.next = list2_node
+                new_list.next = list2
+                list2 = list2.next
             new_list = new_list.next
 
-        if list1 is None and list2 is not None:
-            new_list.next = list2
-        if list1 is not None and list2 is None:
+        if list1 is not None:
             new_list.next = list1
-        return new_list_head
-
+        if list2 is not None:
+            new_list.next = list2
+        return list_head.next
+        
     def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         if len(lists) == 0:
             return None

@@ -8,21 +8,20 @@ class Node:
 
 class Solution:
     def cloneGraph(self, node: 'Node') -> 'Node':
-        visited = set()
         if node is None:
             return None
-        to_discover = {node.val: node}
-        first_cpy_node = Node(node.val)
-        copy_nodes = {node.val: first_cpy_node}
-        while to_discover.keys():
-            key = set(to_discover.keys()).pop()
-            node = to_discover[key]
+        visited = [False]*101
+        stack = [(node, Node(node.val))]
+        visited[1] = stack[0][1]
+        while(stack):
+            node, new_node = stack.pop()
+            for neib in node.neighbors:
+                if not visited[neib.val]:
+                    new_neib = Node(neib.val)
+                    visited[neib.val] = new_neib
+                    stack.append((neib, new_neib))
+                else:
+                    new_neib = visited[neib.val]
+                new_node.neighbors.append(new_neib)
             
-            del to_discover[key]
-            visited.add(key)
-            for neighbor in node.neighbors:
-                if neighbor.val not in copy_nodes:
-                    copy_nodes[neighbor.val] = Node(neighbor.val)
-                    to_discover[neighbor.val] = neighbor
-                copy_nodes[node.val].neighbors.append(copy_nodes[neighbor.val])
-        return first_cpy_node
+        return visited[1]

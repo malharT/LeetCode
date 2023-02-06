@@ -1,39 +1,30 @@
 class Solution:
-    def getPrereqs(self, course, prereqs, processing_children, unprocessed_children):
-        pre_courses = prereqs[course]
-        if processing_children.intersection(pre_courses):
-            return False
-        all_descendants = set()
-        for pre_course in pre_courses:
-            if pre_course in unprocessed_children:
-                unprocessed_children.remove(pre_course)
-                processing_children.add(pre_course)
-                result = self.getPrereqs(pre_course, prereqs, processing_children, unprocessed_children)
-                if result:
-                    result, descendants = result
-                    all_descendants.update(descendants)
-                    processing_children.remove(pre_course)
-                else:
-                    return False
-        pre_courses.update(all_descendants)
-        return True, pre_courses
-
-    def canFinish(self, numCourses, prerequisites):
-        prereqs = []
-        for course in range(numCourses):
-            prereqs.append(set())
-        for prereq in prerequisites:
-            a = prereq[0]
-            b = prereq[1]
-            if not b in prereqs[a]:
-                prereqs[a].add(b)
-            else:
-                return False
-
-        unprocessed_prereqs = set(range(numCourses))
-        while unprocessed_prereqs:
-            course = unprocessed_prereqs.pop()
-            result = self.getPrereqs(course, prereqs, set([course]), unprocessed_prereqs)
-            if not result:
-                return False
+    def dfs(self, node, completed, visited, course_tree):
+        if node not in completed: return True
+        if node in visited: return False
+        visited.add(node)
+        if node in course_tree:
+            for par in course_tree[node]:
+                out = self.dfs(par, completed, visited, course_tree)
+                if not out: return False
+        completed.remove(node)
         return True
+
+        
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        course_tree = {}
+        completed = set()
+        for pre in prerequisites:
+            source = pre[1]
+            target = pre[0]
+            completed.add(target)
+            if target not in course_tree:
+                course_tree[target] = []
+            course_tree[target].append(source)
+        children = {}
+
+        for course in course_tree:
+            out = self.dfs(course, completed, set(), course_tree)
+            if not out: return False
+            if course in completed:completed.remove(course)
+        return all(completed)
